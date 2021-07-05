@@ -1,0 +1,400 @@
+/* Class: MainWindow
+ * This file contains the implementations of MainWindow class methods.
+ *
+ * Program author
+ * Name: Jori Rintakangas
+ * Student number: 291679
+ * UserID: ksjori
+ * E-Mail: jori.rintakangas@tuni.fi
+ */
+
+#include "mainwindow.hh"
+#include "ui_mainwindow.h"
+
+#include <QDebug>
+#include <QTimer>
+#include <QKeyEvent>
+#include <QGraphicsRectItem>
+
+
+/* Constructor
+ */
+MainWindow::MainWindow(QWidget *parent):
+    QMainWindow(parent),
+    ui_(new Ui::MainWindow)
+{
+    ui_->setupUi(this);
+
+    // Graphics scene where rectangles are drawed.
+    scene_ = new QGraphicsScene(this);
+
+    // The graphicsView object is placed on the window
+    // at the following coordinates
+    int left_margin = 100; // x coordinate
+    int top_margin = 150; // y coordinate
+
+    // Setting the graphicsView size.
+    ui_->graphicsView->setGeometry(left_margin, top_margin,
+                                  BORDER_RIGHT + 2, BORDER_DOWN + 2);
+    ui_->graphicsView->setScene(scene_);
+
+    // Setting the game screen size.
+    scene_->setSceneRect(0, 0, BORDER_RIGHT - 1, BORDER_DOWN - 1);
+
+    // Setting colours to the text browser
+    ui_->textBrowser->setTextColor(Qt::black);
+    ui_->textBrowser->setStyleSheet("background-color: red");
+
+    // Setting random engine to get tetrominos randomly.
+    int seed = time(0);
+    randomEng.seed(seed);
+    distr = std::uniform_int_distribution<int>(0, 3);
+    distr(randomEng); // Wiping out the first random number
+
+    // Setting colours for gaming time displays.
+    ui_->lcd_number_minutes->setStyleSheet("background-color: red");
+    ui_->lcd_number_seconds->setStyleSheet("background-color: red");
+
+    // Setting timers for tetromino movements and for gaming time
+    timer_.setSingleShot(false);
+    game_timer_.setSingleShot(false);
+    connect(&timer_, &QTimer::timeout, this, &MainWindow::move_tetrominos);
+    connect(&game_timer_, &QTimer::timeout, this, &MainWindow::time_passed);
+}
+
+
+/* Destructor
+ */
+MainWindow::~MainWindow()
+{
+    delete ui_;
+}
+
+
+/* Executes a tetromino movement according to the given key input.
+ */
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    qreal delta_x = STEP;
+    qreal delta_y = 0;
+    if ( event->key() == Qt::Key_D )
+    {
+        if ( can_move_right() )
+        {
+            for ( auto& square : tetromino_ )
+            {
+                square->moveBy(delta_x, delta_y);
+            }
+        }
+    }
+    if ( event->key() == Qt::Key_A )
+    {
+        if ( can_move_left() )
+        {
+            for ( auto& square : tetromino_ )
+            {
+                square->moveBy(-delta_x, delta_y);
+            }
+        }
+    }
+}
+
+
+/* Sets start button disabled, initializes screen layout, starts timers
+ * and calls function new_tetromino to create tetromino on the screen.
+ */
+void MainWindow::on_start_push_button_clicked()
+{
+    ui_->start_push_button->setDisabled(true);
+    ui_->textBrowser->setText("Game on!");
+    initialize_screen_layout();
+    timer_.start(500);
+    game_timer_.start(1000);
+    new_tetromino();
+}
+
+
+/* This method resets the game when reset button is pressed.
+ */
+void MainWindow::on_reset_push_button_clicked()
+{
+    // List contains all rectItems on the screen.
+    QList<QGraphicsItem*> items = ui_->graphicsView->items();
+
+    for ( auto& item : items )
+    {
+        scene_->removeItem(item);
+    }
+    seconds_ = 0;
+    minutes_ = 0;
+    timer_.stop();
+    game_timer_.stop();
+
+    ui_->lcd_number_seconds->display(seconds_);
+    ui_->lcd_number_minutes->display(minutes_);
+
+    game_over_ = false;
+    screen_layout_.clear();
+    tetromino_.clear();
+    ui_->textBrowser->clear();
+    ui_->start_push_button->setDisabled(false);
+}
+
+
+/* Moves a single tetromino one step down if moving is possible.
+ *
+ */
+void MainWindow::move_tetrominos()
+{
+    qreal delta_x = 0;
+    qreal delta_y = STEP;
+
+    if ( can_move_down() )
+    {
+        for ( auto& square : tetromino_ )
+        {
+            square->moveBy(delta_x, delta_y);
+        }
+    }
+    else
+    {
+        store_item_info();
+        if ( not game_over_ )
+        {
+            tetromino_.clear();
+            new_tetromino();
+        }
+        else
+        {
+            timer_.stop();
+            game_timer_.stop();
+            ui_->textBrowser->setTextColor(Qt::black);
+            ui_->textBrowser->setText("Game over!");
+        }
+    }
+}
+
+
+/* Creates a random tetromino according to the random number value.
+ */
+void MainWindow::new_tetromino()
+{
+    // Colours for different tetromino shapes.
+    QBrush redBrush(Qt::red);
+    QBrush blueBrush(Qt::blue);
+    QBrush yellowBrush(Qt::yellow);
+    QBrush greenBrush(Qt::green);
+    QPen blackPen(Qt::black);
+    blackPen.setWidth(2);
+
+    int random = distr(randomEng); // random value to get random shape
+    int line = 80; // value for placing tetromino on the screen
+    if ( random == 0 )
+    {   // creating horizontal tetromino
+        for ( int i = 0; i < 4; ++i )
+        {
+            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, redBrush);
+            square_->moveBy(line, 0);
+            tetromino_.push_back(square_);
+            line += 20;
+        }
+    }
+    if ( random == 1 )
+    {   // creating right corner tetromino
+        for ( int i = 0; i < 3; ++i )
+        {
+            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, blueBrush);
+            square_->moveBy(line, 0);
+            tetromino_.push_back(square_);
+            line += 20;
+        }
+        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, blueBrush);
+        square_->moveBy(line - STEP, -STEP);
+        tetromino_.push_back(square_);
+    }
+    if ( random == 2 )
+    {   // creating left corner tetromino
+        for ( int i = 0; i < 3; ++i )
+        {
+            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, yellowBrush);
+            square_->moveBy(line, 0);
+            tetromino_.push_back(square_);
+            line += 20;
+        }
+        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, yellowBrush);
+        square_->moveBy((line - 3 * STEP), -STEP);
+        tetromino_.push_back(square_);
+    }
+    if ( random == 3 )
+    {   // creating square tetromino
+        int line = 100; // value for placing tetromino on the screen
+        for ( int i = 0; i < 2; ++i )
+        {
+            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, greenBrush);
+            square_->moveBy(line, 0);
+            tetromino_.push_back(square_);
+            line += 20;
+        }
+        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, greenBrush);
+        square_->moveBy(line - STEP, -STEP);
+        tetromino_.push_back(square_);
+
+        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, greenBrush);
+        square_->moveBy(line - 2 * STEP, -STEP);
+        tetromino_.push_back(square_);
+    }
+}
+
+
+/* Checks if moving single tetromino one step down is possible.
+ * Returns true if possible, false otherwise.
+ */
+bool MainWindow::can_move_down()
+{
+    for ( auto& square : tetromino_ )
+    {
+        qreal current_y = square->y();
+        qreal current_x = square->x();
+        // If tetromino reached the bottom of the screen.
+        if ( current_y == BORDER_DOWN - SQUARE_SIDE )
+        {
+            return false;
+        }
+        qreal next_y = current_y + STEP; // where tetromino is about to move
+        for ( auto& screen_square : screen_layout_ )
+        {
+            if ( current_x == screen_square.x and next_y == screen_square.y )
+            {
+                if ( screen_square.has_item )
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
+/* After tetromino can not move anymore, this method sets the has_item
+ * value to true of those coordinates where tetromino stopped. Also checks
+ * if game is over.
+ */
+void MainWindow::store_item_info()
+{
+    for ( auto& square : tetromino_ )
+    {
+        qreal current_y = square->y();
+        qreal current_x = square->x();
+        if ( current_y == BORDER_UP )
+        {
+            game_over_ = true;
+        }
+        for ( auto& screen_square : screen_layout_ )
+        {
+            if ( current_x == screen_square.x and current_y == screen_square.y)
+            {
+                screen_square.has_item = true;
+            }
+        }
+    }
+}
+
+
+/* Initializes screen layout by storing every coordinate of the game screen
+ * and truth value has_item to the struct ScreenSquare.
+ * These structs are stored to the vector screen_layout_.
+ */
+void MainWindow::initialize_screen_layout()
+{
+    qreal x_coordinate = 0;
+    qreal y_coordinate = 0;
+    bool has_item = false;
+    for ( int i = 1; i <= COLUMNS * ROWS; ++i )
+    {
+        ScreenSquare s = { x_coordinate, y_coordinate, has_item };
+        screen_layout_.push_back(s);
+        x_coordinate += STEP;
+        if ( i % 12 == 0 )
+        {
+            y_coordinate += STEP;
+            x_coordinate = 0;
+        }
+    }
+}
+
+
+/* Checks if moving tetromino to the right is possible.
+ * Returns true if moving possible, false otherwise.
+ */
+bool MainWindow::can_move_right()
+{
+    for ( auto& square : tetromino_ )
+    {
+        qreal current_y = square->y();
+        qreal current_x = square->x();
+        if ( current_x == BORDER_RIGHT - SQUARE_SIDE )
+        {
+            return false;
+        }
+        qreal next_x = current_x + STEP; // where tetromino is about to move
+        for ( auto& screen_square : screen_layout_ )
+        {
+            if ( next_x == screen_square.x and current_y == screen_square.y )
+            {
+                if ( screen_square.has_item )
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+
+}
+
+
+/* Checks if moving tetromino to the left is possible.
+ * Returns true if moving possible, false otherwise.
+ */
+bool MainWindow::can_move_left()
+{
+    for ( auto& square : tetromino_ )
+    {
+       qreal current_y = square->y();
+       qreal current_x = square->x();
+       if ( current_x == BORDER_LEFT )
+       {
+           return false;
+       }
+       qreal next_x = current_x - STEP; // where tetromino is about to move
+       for ( auto& screen_square : screen_layout_ )
+       {
+           if ( next_x == screen_square.x and current_y == screen_square.y )
+           {
+               if ( screen_square.has_item )
+               {
+                   return false;
+               }
+           }
+       }
+    }
+    return true;
+}
+
+
+/* This method calculates correct numbers to display gaming time
+ * on the screen.
+ */
+void MainWindow::time_passed()
+{
+    ++seconds_;
+
+    if ( seconds_ >= 60 )
+    {
+        ++minutes_;
+        seconds_ = 0;
+    }
+    ui_->lcd_number_seconds->display(seconds_);
+    ui_->lcd_number_minutes->display(minutes_);
+}
