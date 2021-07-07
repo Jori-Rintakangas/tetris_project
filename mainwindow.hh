@@ -23,6 +23,7 @@
 #include <vector>
 #include <algorithm>
 #include <cctype>
+#include <map>
 
 
 namespace Ui {
@@ -103,7 +104,7 @@ private:
 
     // Represents a single tetromino.
     std::vector<QGraphicsRectItem*> tetromino_;
-
+    Tetromino* new_tetromino_;
     // For randomly selecting the next dropping tetromino.
     std::default_random_engine randomEng;
     std::uniform_int_distribution<int> distr;

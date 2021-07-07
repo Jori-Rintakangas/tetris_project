@@ -97,6 +97,14 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             }
         }
     }
+    if ( event->key() == Qt::Key_P )
+    {
+        new_tetromino_->rotate_clockwise();
+    }
+    if ( event->key() == Qt::Key_O )
+    {
+        new_tetromino_->rotate_anticlockwise();
+    }
 }
 
 
@@ -179,10 +187,10 @@ void MainWindow::move_tetrominos()
  */
 void MainWindow::new_tetromino()
 {
-    Tetromino* new_tetromino = new Tetromino(scene_);
+    new_tetromino_ = new Tetromino(scene_);
     int random = distr(randomEng); // random value to get random shape
-    tetromino_ = new_tetromino->create_tetromino(random);
-    tetrominos_.push_back(new_tetromino);
+    tetromino_ = new_tetromino_->create_tetromino(random);
+    tetrominos_.push_back(new_tetromino_);
 }
 
 
