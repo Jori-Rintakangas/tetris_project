@@ -179,70 +179,10 @@ void MainWindow::move_tetrominos()
  */
 void MainWindow::new_tetromino()
 {
-    // Colours for different tetromino shapes.
-    QBrush redBrush(Qt::red);
-    QBrush blueBrush(Qt::blue);
-    QBrush yellowBrush(Qt::yellow);
-    QBrush greenBrush(Qt::green);
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(2);
-
+    Tetromino* new_tetromino = new Tetromino(scene_);
     int random = distr(randomEng); // random value to get random shape
-    int line = 80; // value for placing tetromino on the screen
-    if ( random == 0 )
-    {   // creating horizontal tetromino
-        for ( int i = 0; i < 4; ++i )
-        {
-            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, redBrush);
-            square_->moveBy(line, 0);
-            tetromino_.push_back(square_);
-            line += 20;
-        }
-    }
-    if ( random == 1 )
-    {   // creating right corner tetromino
-        for ( int i = 0; i < 3; ++i )
-        {
-            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, blueBrush);
-            square_->moveBy(line, 0);
-            tetromino_.push_back(square_);
-            line += 20;
-        }
-        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, blueBrush);
-        square_->moveBy(line - STEP, -STEP);
-        tetromino_.push_back(square_);
-    }
-    if ( random == 2 )
-    {   // creating left corner tetromino
-        for ( int i = 0; i < 3; ++i )
-        {
-            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, yellowBrush);
-            square_->moveBy(line, 0);
-            tetromino_.push_back(square_);
-            line += 20;
-        }
-        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, yellowBrush);
-        square_->moveBy((line - 3 * STEP), -STEP);
-        tetromino_.push_back(square_);
-    }
-    if ( random == 3 )
-    {   // creating square tetromino
-        int line = 100; // value for placing tetromino on the screen
-        for ( int i = 0; i < 2; ++i )
-        {
-            square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, greenBrush);
-            square_->moveBy(line, 0);
-            tetromino_.push_back(square_);
-            line += 20;
-        }
-        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, greenBrush);
-        square_->moveBy(line - STEP, -STEP);
-        tetromino_.push_back(square_);
-
-        square_ = scene_->addRect(0, 0, STEP, STEP, blackPen, greenBrush);
-        square_->moveBy(line - 2 * STEP, -STEP);
-        tetromino_.push_back(square_);
-    }
+    tetromino_ = new_tetromino->create_tetromino(random);
+    tetrominos_.push_back(new_tetromino);
 }
 
 

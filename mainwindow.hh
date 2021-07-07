@@ -11,6 +11,8 @@
 #ifndef MAINWINDOW_HH
 #define MAINWINDOW_HH
 
+#include "tetromino.hh"
+
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
@@ -116,6 +118,8 @@ private:
 
     // This vector contains all squares on the game layout.
     std::vector<ScreenSquare> screen_layout_;
+
+    std::vector<Tetromino*> tetrominos_;
 
     // These numbers are used when counting the gaming time.
     int minutes_ = 0;
