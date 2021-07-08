@@ -19,6 +19,10 @@ public:
 
     void rotate_anticlockwise();
 
+    std::pair<qreal, qreal> calculate_new_coords(bool direction);
+
+    std::map<int, QGraphicsRectItem*> get_tetromino_info();
+
 private:
 
     QGraphicsScene* scene_;

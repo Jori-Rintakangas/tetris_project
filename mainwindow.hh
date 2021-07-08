@@ -78,6 +78,10 @@ private:
     // Checks if tetromino can move left. True if can, false otherwise
     bool can_move_left();
 
+    bool can_rotate_clockwise();
+
+    bool can_rotate_anticlockwise();
+
     // Calculates gaming time
     void time_passed();
 

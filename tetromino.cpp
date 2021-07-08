@@ -83,6 +83,8 @@ std::vector<QGraphicsRectItem *> Tetromino::create_tetromino(int random)
 
 void Tetromino::rotate_clockwise()
 {
+    std::vector<qreal> new_coords = {};
+
     qreal center_x = tetromino_contents_.at(CENTER_BLOCK)->x();
     qreal center_y = tetromino_contents_.at(CENTER_BLOCK)->y();
 
@@ -109,5 +111,15 @@ void Tetromino::rotate_anticlockwise()
         qreal new_y = old_x - center_x + center_y;
         block.second->moveBy(new_x - old_x, new_y - old_y);
     }
+}
+
+std::pair<qreal, qreal> Tetromino::calculate_new_coords(bool direction)
+{
+
+}
+
+std::map<int, QGraphicsRectItem *> Tetromino::get_tetromino_info()
+{
+    return tetromino_contents_;
 }
 

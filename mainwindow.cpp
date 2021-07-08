@@ -99,11 +99,17 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     }
     if ( event->key() == Qt::Key_P )
     {
-        new_tetromino_->rotate_clockwise();
+        if ( can_rotate_clockwise() )
+        {
+            new_tetromino_->rotate_clockwise();
+        }
     }
     if ( event->key() == Qt::Key_O )
     {
-        new_tetromino_->rotate_anticlockwise();
+        if ( can_rotate_anticlockwise() )
+        {
+            new_tetromino_->rotate_anticlockwise();
+        }
     }
 }
 
@@ -326,6 +332,58 @@ bool MainWindow::can_move_left()
                }
            }
        }
+    }
+    return true;
+}
+
+bool MainWindow::can_rotate_clockwise()
+{
+    std::map<int, QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
+
+    qreal center_x = bricks.at(CENTER_BLOCK)->x();
+    qreal center_y = bricks.at(CENTER_BLOCK)->y();
+
+    for ( auto block : bricks )
+    {
+        qreal old_x = block.second->x();
+        qreal old_y = block.second->y();
+        qreal new_x = old_y + center_x - center_y;
+        qreal new_y = -old_x + center_x + center_y;
+
+        if ( new_x > BORDER_RIGHT - STEP || new_x < BORDER_LEFT )
+        {
+            return false;
+        }
+        else if ( new_y > BORDER_DOWN - STEP )
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool MainWindow::can_rotate_anticlockwise()
+{
+    std::map<int, QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
+
+    qreal center_x = bricks.at(CENTER_BLOCK)->x();
+    qreal center_y = bricks.at(CENTER_BLOCK)->y();
+
+    for ( auto block : bricks )
+    {
+        qreal old_x = block.second->x();
+        qreal old_y = block.second->y();
+        qreal new_x = -old_y + center_x + center_y;
+        qreal new_y = old_x - center_x + center_y;
+
+        if ( new_x > BORDER_RIGHT - STEP || new_x < BORDER_LEFT )
+        {
+            return false;
+        }
+        else if ( new_y > BORDER_DOWN - STEP )
+        {
+            return false;
+        }
     }
     return true;
 }
