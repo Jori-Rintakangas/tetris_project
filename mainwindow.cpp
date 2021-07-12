@@ -312,15 +312,14 @@ bool MainWindow::can_move_left()
 
 bool MainWindow::can_rotate_clockwise()
 {
-    std::map<int, QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
+    std::vector<QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
+    qreal center_x = bricks.at(new_tetromino_->get_center_brick())->x();
+    qreal center_y = bricks.at(new_tetromino_->get_center_brick())->y();
 
-    qreal center_x = bricks.at(CENTER_BLOCK)->x();
-    qreal center_y = bricks.at(CENTER_BLOCK)->y();
-
-    for ( auto block : bricks )
+    for ( auto &brick : bricks )
     {
-        qreal old_x = block.second->x();
-        qreal old_y = block.second->y();
+        qreal old_x = brick->x();
+        qreal old_y = brick->y();
         qreal new_x = old_y + center_x - center_y;
         qreal new_y = -old_x + center_x + center_y;
 
@@ -338,15 +337,14 @@ bool MainWindow::can_rotate_clockwise()
 
 bool MainWindow::can_rotate_anticlockwise()
 {
-    std::map<int, QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
+    std::vector<QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
+    qreal center_x = bricks.at(new_tetromino_->get_center_brick())->x();
+    qreal center_y = bricks.at(new_tetromino_->get_center_brick())->y();
 
-    qreal center_x = bricks.at(CENTER_BLOCK)->x();
-    qreal center_y = bricks.at(CENTER_BLOCK)->y();
-
-    for ( auto block : bricks )
+    for ( auto &brick : bricks )
     {
-        qreal old_x = block.second->x();
-        qreal old_y = block.second->y();
+        qreal old_x = brick->x();
+        qreal old_y = brick->y();
         qreal new_x = -old_y + center_x + center_y;
         qreal new_y = old_x - center_x + center_y;
 
