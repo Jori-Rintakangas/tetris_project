@@ -75,35 +75,15 @@ std::vector<QGraphicsRectItem*> Tetromino::create_tetromino(int random)
     return tetromino_bricks_;
 }
 
-void Tetromino::rotate_clockwise()
+void Tetromino::rotate_tetromino(std::vector<std::pair<qreal, qreal>> new_coords)
 {
-    std::vector<qreal> new_coords = {};
-
-    qreal center_x = tetromino_bricks_.at(center_brick_)->x();
-    qreal center_y = tetromino_bricks_.at(center_brick_)->y();
-
+    int i = 0;
     for ( auto &brick : tetromino_bricks_ )
     {
         qreal old_x = brick->x();
         qreal old_y = brick->y();
-        qreal new_x = old_y + center_x - center_y;
-        qreal new_y = -old_x + center_x + center_y;
-        brick->moveBy(new_x - old_x, new_y - old_y);
-    }
-}
-
-void Tetromino::rotate_anticlockwise()
-{
-    qreal center_x = tetromino_bricks_.at(center_brick_)->x();
-    qreal center_y = tetromino_bricks_.at(center_brick_)->y();
-
-    for ( auto &brick : tetromino_bricks_ )
-    {
-        qreal old_x = brick->x();
-        qreal old_y = brick->y();
-        qreal new_x = -old_y + center_x + center_y;
-        qreal new_y = old_x - center_x + center_y;
-        brick->moveBy(new_x - old_x, new_y - old_y);
+        brick->moveBy(new_coords.at(i).first - old_x, new_coords.at(i).second - old_y);
+        i++;
     }
 }
 
@@ -120,5 +100,10 @@ std::vector<QGraphicsRectItem *> Tetromino::get_tetromino_info()
 int Tetromino::get_center_brick()
 {
     return center_brick_;
+}
+
+int Tetromino::get_tetromino_type()
+{
+    return tetromino_type_;
 }
 

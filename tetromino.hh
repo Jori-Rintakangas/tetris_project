@@ -18,15 +18,15 @@ public:
 
     std::vector<QGraphicsRectItem*> create_tetromino(int random);
 
-    void rotate_clockwise();
-
-    void rotate_anticlockwise();
+    void rotate_tetromino(std::vector<std::pair<qreal,qreal>> new_coords);
 
     std::pair<qreal, qreal> calculate_new_coords(bool direction);
 
     std::vector<QGraphicsRectItem*> get_tetromino_info();
 
     int get_center_brick();
+
+    int get_tetromino_type();
 
 private:
 

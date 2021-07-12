@@ -78,9 +78,7 @@ private:
     // Checks if tetromino can move left. True if can, false otherwise
     bool can_move_left();
 
-    bool can_rotate_clockwise();
-
-    bool can_rotate_anticlockwise();
+    bool can_rotate(bool clockwise);
 
     void check_for_full_row();
 
@@ -118,6 +116,7 @@ private:
     // This map contains all squares on the game layout.
     std::map<std::pair<qreal,qreal>,bool> screen_layout_;
 
+    std::vector<std::pair<qreal,qreal>> new_coords_;
     std::vector<Tetromino*> tetrominos_;
 
     // These numbers are used when counting the gaming time.

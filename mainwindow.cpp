@@ -99,16 +99,22 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     }
     if ( event->key() == Qt::Key_P )
     {
-        if ( can_rotate_clockwise() )
+        if ( new_tetromino_->get_tetromino_type() != SQUARE )
         {
-            new_tetromino_->rotate_clockwise();
+            if ( can_rotate(true) )
+            {
+                new_tetromino_->rotate_tetromino(new_coords_);
+            }
         }
     }
     if ( event->key() == Qt::Key_O )
     {
-        if ( can_rotate_anticlockwise() )
+        if ( new_tetromino_->get_tetromino_type() != SQUARE )
         {
-            new_tetromino_->rotate_anticlockwise();
+            if ( can_rotate(false) )
+            {
+                new_tetromino_->rotate_tetromino(new_coords_);
+            }
         }
     }
 }
@@ -250,7 +256,14 @@ void MainWindow::store_item_info()
 void MainWindow::initialize_screen_layout()
 {
     qreal x_coordinate = 0;
-    qreal y_coordinate = 0;
+    qreal y_coordinate = -STEP;
+    for ( int i = 0; i <= 11; ++i )
+    {
+        screen_layout_.insert({{x_coordinate, y_coordinate}, false});
+        x_coordinate += STEP;
+    }
+    x_coordinate = 0;
+    y_coordinate = 0;
     for ( int i = 1; i <= COLUMNS * ROWS; ++i )
     {
         screen_layout_.insert({{x_coordinate, y_coordinate}, false});
@@ -310,55 +323,45 @@ bool MainWindow::can_move_left()
     return true;
 }
 
-bool MainWindow::can_rotate_clockwise()
+bool MainWindow::can_rotate(bool clockwise)
 {
     std::vector<QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
     qreal center_x = bricks.at(new_tetromino_->get_center_brick())->x();
     qreal center_y = bricks.at(new_tetromino_->get_center_brick())->y();
-
+    new_coords_.clear();
     for ( auto &brick : bricks )
     {
         qreal old_x = brick->x();
         qreal old_y = brick->y();
-        qreal new_x = old_y + center_x - center_y;
-        qreal new_y = -old_x + center_x + center_y;
-
+        qreal new_x = 0;
+        qreal new_y = 0;
+        if ( clockwise )
+        {
+            new_x = old_y + center_x - center_y;
+            new_y = -old_x + center_x + center_y;
+        }
+        else
+        {
+            new_x = -old_y + center_x + center_y;
+            new_y = old_x - center_x + center_y;
+        }
         if ( new_x > BORDER_RIGHT - STEP || new_x < BORDER_LEFT )
         {
             return false;
         }
-        else if ( new_y > BORDER_DOWN - STEP )
+        else if ( new_y > BORDER_DOWN - STEP || new_y < BORDER_UP )
         {
             return false;
         }
+        else if ( screen_layout_.at({new_x, new_y}) == true )
+        {
+            return false;
+        }
+        new_coords_.push_back({new_x, new_y});
     }
     return true;
 }
 
-bool MainWindow::can_rotate_anticlockwise()
-{
-    std::vector<QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
-    qreal center_x = bricks.at(new_tetromino_->get_center_brick())->x();
-    qreal center_y = bricks.at(new_tetromino_->get_center_brick())->y();
-
-    for ( auto &brick : bricks )
-    {
-        qreal old_x = brick->x();
-        qreal old_y = brick->y();
-        qreal new_x = -old_y + center_x + center_y;
-        qreal new_y = old_x - center_x + center_y;
-
-        if ( new_x > BORDER_RIGHT - STEP || new_x < BORDER_LEFT )
-        {
-            return false;
-        }
-        else if ( new_y > BORDER_DOWN - STEP )
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
 void MainWindow::check_for_full_row()
 {
