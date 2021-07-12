@@ -82,6 +82,8 @@ private:
 
     bool can_rotate_anticlockwise();
 
+    void check_for_full_row();
+
     // Calculates gaming time
     void time_passed();
 
@@ -113,16 +115,8 @@ private:
     std::default_random_engine randomEng;
     std::uniform_int_distribution<int> distr;
 
-    // This struct represents empty square on the game layout.
-    struct ScreenSquare
-    {
-        qreal x;
-        qreal y;
-        bool has_item;
-    };
-
-    // This vector contains all squares on the game layout.
-    std::vector<ScreenSquare> screen_layout_;
+    // This map contains all squares on the game layout.
+    std::map<std::pair<qreal,qreal>,bool> screen_layout_;
 
     std::vector<Tetromino*> tetrominos_;
 

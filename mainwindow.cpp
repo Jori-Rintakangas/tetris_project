@@ -215,15 +215,9 @@ bool MainWindow::can_move_down()
             return false;
         }
         qreal next_y = current_y + STEP; // where tetromino is about to move
-        for ( auto& screen_square : screen_layout_ )
+        if ( screen_layout_.at({current_x, next_y}) == true )
         {
-            if ( current_x == screen_square.x and next_y == screen_square.y )
-            {
-                if ( screen_square.has_item )
-                {
-                    return false;
-                }
-            }
+            return false;
         }
     }
     return true;
@@ -244,13 +238,7 @@ void MainWindow::store_item_info()
         {
             game_over_ = true;
         }
-        for ( auto& screen_square : screen_layout_ )
-        {
-            if ( current_x == screen_square.x and current_y == screen_square.y)
-            {
-                screen_square.has_item = true;
-            }
-        }
+        screen_layout_.at({current_x, current_y}) = true;
     }
 }
 
@@ -263,11 +251,9 @@ void MainWindow::initialize_screen_layout()
 {
     qreal x_coordinate = 0;
     qreal y_coordinate = 0;
-    bool has_item = false;
     for ( int i = 1; i <= COLUMNS * ROWS; ++i )
     {
-        ScreenSquare s = { x_coordinate, y_coordinate, has_item };
-        screen_layout_.push_back(s);
+        screen_layout_.insert({{x_coordinate, y_coordinate}, false});
         x_coordinate += STEP;
         if ( i % 12 == 0 )
         {
@@ -292,15 +278,9 @@ bool MainWindow::can_move_right()
             return false;
         }
         qreal next_x = current_x + STEP; // where tetromino is about to move
-        for ( auto& screen_square : screen_layout_ )
+        if ( screen_layout_.at({next_x, current_y} ) == true )
         {
-            if ( next_x == screen_square.x and current_y == screen_square.y )
-            {
-                if ( screen_square.has_item )
-                {
-                    return false;
-                }
-            }
+            return false;
         }
     }
     return true;
@@ -322,15 +302,9 @@ bool MainWindow::can_move_left()
            return false;
        }
        qreal next_x = current_x - STEP; // where tetromino is about to move
-       for ( auto& screen_square : screen_layout_ )
+       if ( screen_layout_.at({next_x, current_y}) == true )
        {
-           if ( next_x == screen_square.x and current_y == screen_square.y )
-           {
-               if ( screen_square.has_item )
-               {
-                   return false;
-               }
-           }
+           return false;
        }
     }
     return true;
@@ -386,6 +360,11 @@ bool MainWindow::can_rotate_anticlockwise()
         }
     }
     return true;
+}
+
+void MainWindow::check_for_full_row()
+{
+
 }
 
 
