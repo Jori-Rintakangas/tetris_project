@@ -13,15 +13,24 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
-#include <QGraphicsItemGroup>
 #include <QRect>
 #include <QTimer>
 #include <random>
 #include <vector>
-#include <algorithm>
-#include <cctype>
 #include <map>
 
+const int STEP = 20;
+const int BORDER_UP = 0;
+const int BORDER_DOWN = 480;
+const int BORDER_LEFT = 0;
+const int BORDER_RIGHT = 240;
+
+const int SQUARE_SIDE = 20;
+const int COLUMNS = BORDER_RIGHT / SQUARE_SIDE;
+const int ROWS = BORDER_DOWN / SQUARE_SIDE;
+
+const int LEFT_MARGIN = 100;
+const int TOP_MARGIN = 150;
 
 namespace Ui {
 class MainWindow;
@@ -43,13 +52,6 @@ private slots:
     void on_reset_push_button_clicked();
 
 private:
-    Ui::MainWindow *ui_;
-
-    QGraphicsScene* scene_;
-
-    QTimer game_timer_;
-
-    QTimer timer_;
 
     void move_tetrominos();
 
@@ -71,27 +73,24 @@ private:
 
     void time_passed();
 
-    bool game_over_ = false;
+    Ui::MainWindow *ui_;
 
-    const int STEP = 20;
-    const int BORDER_UP = 0;
-    const int BORDER_DOWN = 480;
-    const int BORDER_LEFT = 0;
-    const int BORDER_RIGHT = 240;
+    QGraphicsScene* scene_;
 
-    const int SQUARE_SIDE = 20;
-    const int COLUMNS = BORDER_RIGHT / SQUARE_SIDE;
-    const int ROWS = BORDER_DOWN / SQUARE_SIDE;
+    QTimer game_timer_;
+    QTimer timer_;
 
     Tetromino* tetromino_;
 
-    std::default_random_engine randomEng;
-    std::uniform_int_distribution<int> distr;
+    std::default_random_engine random_eng_;
+    std::uniform_int_distribution<int> distr_;
 
-    std::map<std::pair<qreal,qreal>,bool> screen_layout_;
+    std::map<std::pair<qreal, qreal>, bool> screen_layout_;
 
-    std::vector<std::pair<qreal,qreal>> new_coords_;
+    std::vector<std::pair<qreal, qreal>> new_coords_;
     std::vector<Tetromino*> tetrominos_;
+
+    bool game_over_ = false;
 
     int minutes_ = 0;
     int seconds_ = 0;

@@ -20,26 +20,22 @@ MainWindow::MainWindow(QWidget *parent):
     ui_->setupUi(this);
 
     scene_ = new QGraphicsScene(this);
-
-    int left_margin = 100;
-    int top_margin = 150;
-
-    ui_->graphicsView->setGeometry(left_margin, top_margin,
-                                  BORDER_RIGHT + 2, BORDER_DOWN + 2);
-    ui_->graphicsView->setScene(scene_);
-
     scene_->setSceneRect(0, 0, BORDER_RIGHT - 1, BORDER_DOWN - 1);
+
+    ui_->graphicsView->setGeometry(LEFT_MARGIN, TOP_MARGIN,
+                                   BORDER_RIGHT + 2, BORDER_DOWN + 2);
+    ui_->graphicsView->setScene(scene_);
 
     ui_->textBrowser->setTextColor(Qt::black);
     ui_->textBrowser->setStyleSheet("background-color: red");
 
-    int seed = time(0);
-    randomEng.seed(seed);
-    distr = std::uniform_int_distribution<int>(0, 3);
-    distr(randomEng); // Wiping out the first random number
-
     ui_->lcd_number_minutes->setStyleSheet("background-color: red");
     ui_->lcd_number_seconds->setStyleSheet("background-color: red");
+
+    int seed = time(0);
+    random_eng_.seed(seed);
+    distr_ = std::uniform_int_distribution<int>(0, 3);
+    distr_(random_eng_); // Wiping out the first random number
 
     timer_.setSingleShot(false);
     game_timer_.setSingleShot(false);
@@ -142,7 +138,7 @@ void MainWindow::move_tetrominos()
     else
     {
         store_item_info();
-        if ( not game_over_ )
+        if ( !game_over_ )
         {
             new_tetromino();
         }
@@ -160,7 +156,7 @@ void MainWindow::move_tetrominos()
 void MainWindow::new_tetromino()
 {
     tetromino_ = new Tetromino(scene_);
-    int random = distr(randomEng);
+    int random = distr_(random_eng_);
     tetromino_->create_tetromino(random);
     tetrominos_.push_back(tetromino_);
 }
