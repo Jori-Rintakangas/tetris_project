@@ -1,3 +1,10 @@
+/* Class: Tetromino
+ * Tetromino class represents a single tetris block.
+ *
+ * Program author:
+ * Jori Rintakangas
+ */
+
 #ifndef TETROMINO_HH
 #define TETROMINO_HH
 
@@ -30,7 +37,7 @@ public:
 
 private:
 
-    int center_brick_; // a brick around which tetromino will rotate
+    int center_brick_;
     int tetromino_type_;
 
     QGraphicsScene* scene_;

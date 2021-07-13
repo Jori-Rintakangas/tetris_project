@@ -1,3 +1,8 @@
+/* Class: Tetromino
+ * Program author:
+ * Jori Rintakangas
+ */
+
 #include "tetromino.hh"
 
 Tetromino::Tetromino(QGraphicsScene* scene)
@@ -14,7 +19,7 @@ std::vector<QGraphicsRectItem*> Tetromino::create_tetromino(int random)
     QPen blackPen(Qt::black);
     blackPen.setWidth(2);
     tetromino_type_ = random;
-    int line = 80; // value for placing tetromino on the screen
+    int line = 80;
     if ( tetromino_type_ == HORIZONTAL )
     {
         center_brick_ = 2;
@@ -56,7 +61,7 @@ std::vector<QGraphicsRectItem*> Tetromino::create_tetromino(int random)
     }
     if ( tetromino_type_ == SQUARE )
     {
-        int line = 100; // value for placing tetromino on the screen
+        int line = 100;
         for ( int i = 0; i < 2; ++i )
         {
             square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, greenBrush);
