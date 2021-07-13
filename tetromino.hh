@@ -27,6 +27,8 @@ public:
 
     void rotate_tetromino(std::vector<std::pair<qreal,qreal>> new_coords);
 
+    void move_horizontal(bool dir_right);
+
     std::pair<qreal, qreal> calculate_new_coords(bool direction);
 
     std::vector<QGraphicsRectItem*> get_tetromino_info();

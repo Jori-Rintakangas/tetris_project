@@ -92,6 +92,24 @@ void Tetromino::rotate_tetromino(std::vector<std::pair<qreal, qreal>> new_coords
     }
 }
 
+void Tetromino::move_horizontal(bool dir_right)
+{
+    if ( dir_right )
+    {
+        for ( auto &brick : tetromino_bricks_ )
+        {
+            brick->moveBy(20, 0);
+        }
+    }
+    else
+    {
+        for ( auto &brick : tetromino_bricks_ )
+        {
+            brick->moveBy(-20, 0);
+        }
+    }
+}
+
 std::pair<qreal, qreal> Tetromino::calculate_new_coords(bool direction)
 {
 

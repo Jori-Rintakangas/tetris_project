@@ -56,45 +56,37 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-    qreal delta_x = STEP;
-    qreal delta_y = 0;
     if ( event->key() == Qt::Key_D )
     {
         if ( can_move_right() )
         {
-            for ( auto& square : tetromino_ )
-            {
-                square->moveBy(delta_x, delta_y);
-            }
+            tetromino_->move_horizontal(true);
         }
     }
     if ( event->key() == Qt::Key_A )
     {
         if ( can_move_left() )
         {
-            for ( auto& square : tetromino_ )
-            {
-                square->moveBy(-delta_x, delta_y);
-            }
+            tetromino_->move_horizontal(false);
         }
     }
     if ( event->key() == Qt::Key_P )
     {
-        if ( new_tetromino_->get_tetromino_type() != SQUARE )
+        if ( tetromino_->get_tetromino_type() != SQUARE )
         {
             if ( can_rotate(true) )
             {
-                new_tetromino_->rotate_tetromino(new_coords_);
+                tetromino_->rotate_tetromino(new_coords_);
             }
         }
     }
     if ( event->key() == Qt::Key_O )
     {
-        if ( new_tetromino_->get_tetromino_type() != SQUARE )
+        if ( tetromino_->get_tetromino_type() != SQUARE )
         {
             if ( can_rotate(false) )
             {
-                new_tetromino_->rotate_tetromino(new_coords_);
+                tetromino_->rotate_tetromino(new_coords_);
             }
         }
     }
@@ -130,7 +122,6 @@ void MainWindow::on_reset_push_button_clicked()
 
     game_over_ = false;
     screen_layout_.clear();
-    tetromino_.clear();
     ui_->textBrowser->clear();
     ui_->start_push_button->setDisabled(false);
 }
@@ -140,12 +131,12 @@ void MainWindow::move_tetrominos()
 {
     qreal delta_x = 0;
     qreal delta_y = STEP;
-
+    std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
     if ( can_move_down() )
     {
-        for ( auto& square : tetromino_ )
+        for ( auto &brick : bricks )
         {
-            square->moveBy(delta_x, delta_y);
+            brick->moveBy(delta_x, delta_y);
         }
     }
     else
@@ -153,7 +144,6 @@ void MainWindow::move_tetrominos()
         store_item_info();
         if ( not game_over_ )
         {
-            tetromino_.clear();
             new_tetromino();
         }
         else
@@ -169,19 +159,20 @@ void MainWindow::move_tetrominos()
 
 void MainWindow::new_tetromino()
 {
-    new_tetromino_ = new Tetromino(scene_);
+    tetromino_ = new Tetromino(scene_);
     int random = distr(randomEng);
-    tetromino_ = new_tetromino_->create_tetromino(random);
-    tetrominos_.push_back(new_tetromino_);
+    tetromino_->create_tetromino(random);
+    tetrominos_.push_back(tetromino_);
 }
 
 
 bool MainWindow::can_move_down()
 {
-    for ( auto& square : tetromino_ )
+    std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
+    for ( auto &brick : bricks )
     {
-        qreal current_y = square->y();
-        qreal current_x = square->x();
+        qreal current_y = brick->y();
+        qreal current_x = brick->x();
 
         if ( current_y == BORDER_DOWN - SQUARE_SIDE )
         {
@@ -199,10 +190,11 @@ bool MainWindow::can_move_down()
 
 void MainWindow::store_item_info()
 {
-    for ( auto& square : tetromino_ )
+    std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
+    for ( auto &brick : bricks )
     {
-        qreal current_y = square->y();
-        qreal current_x = square->x();
+        qreal current_y = brick->y();
+        qreal current_x = brick->x();
         if ( current_y == BORDER_UP )
         {
             game_over_ = true;
@@ -238,10 +230,11 @@ void MainWindow::initialize_screen_layout()
 
 bool MainWindow::can_move_right()
 {
-    for ( auto& square : tetromino_ )
+    std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
+    for ( auto &brick : bricks )
     {
-        qreal current_y = square->y();
-        qreal current_x = square->x();
+        qreal current_y = brick->y();
+        qreal current_x = brick->x();
         if ( current_x == BORDER_RIGHT - SQUARE_SIDE )
         {
             return false;
@@ -259,10 +252,11 @@ bool MainWindow::can_move_right()
 
 bool MainWindow::can_move_left()
 {
-    for ( auto& square : tetromino_ )
+    std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
+    for ( auto &brick : bricks )
     {
-       qreal current_y = square->y();
-       qreal current_x = square->x();
+       qreal current_y = brick->y();
+       qreal current_x = brick->x();
        if ( current_x == BORDER_LEFT )
        {
            return false;
@@ -278,9 +272,9 @@ bool MainWindow::can_move_left()
 
 bool MainWindow::can_rotate(bool clockwise)
 {
-    std::vector<QGraphicsRectItem*> bricks = new_tetromino_->get_tetromino_info();
-    qreal center_x = bricks.at(new_tetromino_->get_center_brick())->x();
-    qreal center_y = bricks.at(new_tetromino_->get_center_brick())->y();
+    std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
+    qreal center_x = bricks.at(tetromino_->get_center_brick())->x();
+    qreal center_y = bricks.at(tetromino_->get_center_brick())->y();
     new_coords_.clear();
     for ( auto &brick : bricks )
     {

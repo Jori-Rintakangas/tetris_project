@@ -83,11 +83,7 @@ private:
     const int COLUMNS = BORDER_RIGHT / SQUARE_SIDE;
     const int ROWS = BORDER_DOWN / SQUARE_SIDE;
 
-
-    QGraphicsRectItem* square_;
-
-    std::vector<QGraphicsRectItem*> tetromino_;
-    Tetromino* new_tetromino_;
+    Tetromino* tetromino_;
 
     std::default_random_engine randomEng;
     std::uniform_int_distribution<int> distr;
