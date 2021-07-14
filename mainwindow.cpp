@@ -138,6 +138,7 @@ void MainWindow::move_tetrominos()
     else
     {
         store_item_info();
+        check_for_full_row();
         if ( !game_over_ )
         {
             new_tetromino();
@@ -308,7 +309,31 @@ bool MainWindow::can_rotate(bool clockwise)
 
 void MainWindow::check_for_full_row()
 {
+    for ( int y = 0; y < BORDER_DOWN; y += STEP )
+    {
+        auto row_begin = screen_layout_.find({BORDER_RIGHT-SQUARE_SIDE, y});
+        auto row_end = screen_layout_.find({BORDER_LEFT, y});
+        if ( std::all_of(row_begin, row_end, [](auto& p){return p.second;}))
+        {
+            erase_full_row(y);
+        }
+    }
+}
 
+void MainWindow::erase_full_row(qreal row_y_coord)
+{
+    for ( auto &tetromino : tetrominos_ )
+    {
+        std::vector<QGraphicsRectItem*> bricks = tetromino->get_tetromino_info();
+        for ( auto &brick : bricks )
+        {
+            if ( brick->y() == row_y_coord )
+            {
+                // TODO tetromino->erase_brick(brick->x(), brick->y());
+                scene_->removeItem(brick);
+            }
+        }
+    }
 }
 
 

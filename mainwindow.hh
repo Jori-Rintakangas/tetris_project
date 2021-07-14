@@ -18,6 +18,7 @@
 #include <random>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 const int STEP = 20;
 const int BORDER_UP = 0;
@@ -31,6 +32,19 @@ const int ROWS = BORDER_DOWN / SQUARE_SIDE;
 
 const int LEFT_MARGIN = 100;
 const int TOP_MARGIN = 150;
+
+struct Comp
+{
+    bool operator()(std::pair<qreal, qreal> p1, std::pair<qreal, qreal> p2)
+    {
+        if ( p1.second == p2.second )
+        {
+            return p1.first > p2.first;
+        }
+        return p1.second > p2.second;
+    }
+};
+
 
 namespace Ui {
 class MainWindow;
@@ -71,6 +85,8 @@ private:
 
     void check_for_full_row();
 
+    void erase_full_row(qreal row_y_coord);
+
     void time_passed();
 
     Ui::MainWindow *ui_;
@@ -85,7 +101,7 @@ private:
     std::default_random_engine random_eng_;
     std::uniform_int_distribution<int> distr_;
 
-    std::map<std::pair<qreal, qreal>, bool> screen_layout_;
+    std::map<std::pair<qreal, qreal>, bool, Comp> screen_layout_;
 
     std::vector<std::pair<qreal, qreal>> new_coords_;
     std::vector<Tetromino*> tetrominos_;
