@@ -110,9 +110,20 @@ void Tetromino::move_horizontal(bool dir_right)
     }
 }
 
-std::pair<qreal, qreal> Tetromino::calculate_new_coords(bool direction)
+void Tetromino::erase_brick(std::vector<std::pair<qreal, qreal>> bricks)
 {
-
+    for ( unsigned int i = 0; i < bricks.size(); ++i )
+    {
+        for ( auto it = tetromino_bricks_.begin();
+                   it != tetromino_bricks_.end(); ++it )
+        {
+            if ( (*it)->x() == bricks.at(i).first && (*it)->y() == bricks.at(i).second )
+            {
+                tetromino_bricks_.erase(it);
+                it--;
+            }
+        }
+    }
 }
 
 std::vector<QGraphicsRectItem *> Tetromino::get_tetromino_info()
@@ -128,5 +139,10 @@ int Tetromino::get_center_brick()
 int Tetromino::get_tetromino_type()
 {
     return tetromino_type_;
+}
+
+bool Tetromino::is_destroyed()
+{
+    return tetromino_bricks_.empty();
 }
 

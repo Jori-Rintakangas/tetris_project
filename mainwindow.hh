@@ -15,10 +15,12 @@
 #include <QGraphicsRectItem>
 #include <QRect>
 #include <QTimer>
+#include <QThread>
 #include <random>
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <iostream>
 
 const int STEP = 20;
 const int BORDER_UP = 0;
@@ -39,9 +41,9 @@ struct Comp
     {
         if ( p1.second == p2.second )
         {
-            return p1.first > p2.first;
+            return p1.first < p2.first;
         }
-        return p1.second > p2.second;
+        return p1.second < p2.second;
     }
 };
 
@@ -87,7 +89,10 @@ private:
 
     void erase_full_row(qreal row_y_coord);
 
+    void update_scene(qreal y);
+
     void time_passed();
+
 
     Ui::MainWindow *ui_;
 

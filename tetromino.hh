@@ -29,13 +29,15 @@ public:
 
     void move_horizontal(bool dir_right);
 
-    std::pair<qreal, qreal> calculate_new_coords(bool direction);
+    void erase_brick(std::vector<std::pair<qreal, qreal>> bricks);
 
     std::vector<QGraphicsRectItem*> get_tetromino_info();
 
     int get_center_brick();
 
     int get_tetromino_type();
+
+    bool is_destroyed();
 
 private:
 

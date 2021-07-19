@@ -94,7 +94,7 @@ void MainWindow::on_start_push_button_clicked()
     ui_->start_push_button->setDisabled(true);
     ui_->textBrowser->setText("Game on!");
     initialize_screen_layout();
-    timer_.start(500);
+    timer_.start(150);
     game_timer_.start(1000);
     new_tetromino();
 }
@@ -243,7 +243,6 @@ bool MainWindow::can_move_right()
         }
     }
     return true;
-
 }
 
 
@@ -266,6 +265,7 @@ bool MainWindow::can_move_left()
     }
     return true;
 }
+
 
 bool MainWindow::can_rotate(bool clockwise)
 {
@@ -311,26 +311,62 @@ void MainWindow::check_for_full_row()
 {
     for ( int y = 0; y < BORDER_DOWN; y += STEP )
     {
-        auto row_begin = screen_layout_.find({BORDER_RIGHT-SQUARE_SIDE, y});
-        auto row_end = screen_layout_.find({BORDER_LEFT, y});
-        if ( std::all_of(row_begin, row_end, [](auto& p){return p.second;}))
+        auto row_begin = screen_layout_.find({BORDER_LEFT, y});
+        auto row_end = screen_layout_.find({BORDER_RIGHT-SQUARE_SIDE, y});
+        if ( std::all_of(row_begin, ++row_end, [](auto& p){return p.second;}))
         {
             erase_full_row(y);
         }
     }
 }
 
+
 void MainWindow::erase_full_row(qreal row_y_coord)
+{
+    for ( auto it = tetrominos_.begin(); it != tetrominos_.end(); ++it )
+    {
+        bool bricks_in_row = false;
+        std::vector<QGraphicsRectItem*> bricks = (*it)->get_tetromino_info();
+        std::vector<std::pair<qreal, qreal>> bricks_to_erase = {};
+
+        for ( auto &brick : bricks )
+        {
+            if ( brick->y() == row_y_coord )
+            {
+                bricks_in_row = true;
+                scene_->removeItem(brick);
+                screen_layout_.at({brick->x(), brick->y()}) = false;
+                bricks_to_erase.push_back({brick->x(), brick->y()});
+            }
+        }
+        if ( !bricks_in_row )
+        {
+            continue;
+        }
+        (*it)->erase_brick(bricks_to_erase);
+        if ( (*it)->is_destroyed() )
+        {
+            tetrominos_.erase(it);
+            it--;
+            //delete *it;
+        }
+    }
+    update_scene(row_y_coord);
+}
+
+
+void MainWindow::update_scene(qreal y)
 {
     for ( auto &tetromino : tetrominos_ )
     {
         std::vector<QGraphicsRectItem*> bricks = tetromino->get_tetromino_info();
         for ( auto &brick : bricks )
         {
-            if ( brick->y() == row_y_coord )
+            if ( brick->y() < y )
             {
-                // TODO tetromino->erase_brick(brick->x(), brick->y());
-                scene_->removeItem(brick);
+                screen_layout_.at({brick->x(), brick->y()}) = false;
+                brick->moveBy(0, STEP);
+                screen_layout_.at({brick->x(), brick->y()}) = true;
             }
         }
     }
