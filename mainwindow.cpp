@@ -66,21 +66,11 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             tetromino_->move_horizontal(false);
         }
     }
-    if ( event->key() == Qt::Key_P )
+    if ( event->key() == Qt::Key_W )
     {
         if ( tetromino_->get_tetromino_type() != SQUARE )
         {
-            if ( can_rotate(true) )
-            {
-                tetromino_->rotate_tetromino(new_coords_);
-            }
-        }
-    }
-    if ( event->key() == Qt::Key_O )
-    {
-        if ( tetromino_->get_tetromino_type() != SQUARE )
-        {
-            if ( can_rotate(false) )
+            if ( can_rotate() )
             {
                 tetromino_->rotate_tetromino(new_coords_);
             }
@@ -94,7 +84,7 @@ void MainWindow::on_start_push_button_clicked()
     ui_->start_push_button->setDisabled(true);
     ui_->textBrowser->setText("Game on!");
     initialize_screen_layout();
-    timer_.start(150);
+    timer_.start(300);
     game_timer_.start(1000);
     new_tetromino();
 }
@@ -267,7 +257,7 @@ bool MainWindow::can_move_left()
 }
 
 
-bool MainWindow::can_rotate(bool clockwise)
+bool MainWindow::can_rotate()
 {
     std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
     qreal center_x = bricks.at(tetromino_->get_center_brick())->x();
@@ -277,18 +267,9 @@ bool MainWindow::can_rotate(bool clockwise)
     {
         qreal old_x = brick->x();
         qreal old_y = brick->y();
-        qreal new_x = 0;
-        qreal new_y = 0;
-        if ( clockwise )
-        {
-            new_x = old_y + center_x - center_y;
-            new_y = -old_x + center_x + center_y;
-        }
-        else
-        {
-            new_x = -old_y + center_x + center_y;
-            new_y = old_x - center_x + center_y;
-        }
+        qreal new_x = -old_y + center_x + center_y;
+        qreal new_y = old_x - center_x + center_y;
+
         if ( new_x > BORDER_RIGHT - STEP || new_x < BORDER_LEFT )
         {
             return false;

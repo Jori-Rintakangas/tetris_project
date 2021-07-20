@@ -83,7 +83,7 @@ private:
 
     bool can_move_left();
 
-    bool can_rotate(bool clockwise);
+    bool can_rotate();
 
     void check_for_full_row();
 
