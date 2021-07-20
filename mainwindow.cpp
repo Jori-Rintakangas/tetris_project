@@ -115,14 +115,12 @@ void MainWindow::on_reset_push_button_clicked()
 
 void MainWindow::move_tetrominos()
 {
-    qreal delta_x = 0;
-    qreal delta_y = STEP;
     std::vector<QGraphicsRectItem*> bricks = tetromino_->get_tetromino_info();
     if ( can_move_down() )
     {
         for ( auto &brick : bricks )
         {
-            brick->moveBy(delta_x, delta_y);
+            brick->moveBy(0, STEP);
         }
     }
     else
@@ -161,7 +159,7 @@ bool MainWindow::can_move_down()
         qreal current_y = brick->y();
         qreal current_x = brick->x();
 
-        if ( current_y == BORDER_DOWN - SQUARE_SIDE )
+        if ( current_y == LIMIT_DOWN )
         {
             return false;
         }
@@ -182,7 +180,7 @@ void MainWindow::store_item_info()
     {
         qreal current_y = brick->y();
         qreal current_x = brick->x();
-        if ( current_y == BORDER_UP )
+        if ( current_y == LIMIT_UP )
         {
             game_over_ = true;
         }
@@ -222,7 +220,7 @@ bool MainWindow::can_move_right()
     {
         qreal current_y = brick->y();
         qreal current_x = brick->x();
-        if ( current_x == BORDER_RIGHT - SQUARE_SIDE )
+        if ( current_x == LIMIT_RIGHT )
         {
             return false;
         }
@@ -243,7 +241,7 @@ bool MainWindow::can_move_left()
     {
        qreal current_y = brick->y();
        qreal current_x = brick->x();
-       if ( current_x == BORDER_LEFT )
+       if ( current_x == LIMIT_LEFT )
        {
            return false;
        }
@@ -270,11 +268,11 @@ bool MainWindow::can_rotate()
         qreal new_x = -old_y + center_x + center_y;
         qreal new_y = old_x - center_x + center_y;
 
-        if ( new_x > BORDER_RIGHT - STEP || new_x < BORDER_LEFT )
+        if ( new_x > LIMIT_RIGHT || new_x < LIMIT_LEFT )
         {
             return false;
         }
-        else if ( new_y > BORDER_DOWN - STEP || new_y < BORDER_UP )
+        else if ( new_y > LIMIT_DOWN || new_y < LIMIT_UP )
         {
             return false;
         }
@@ -292,8 +290,8 @@ void MainWindow::check_for_full_row()
 {
     for ( int y = 0; y < BORDER_DOWN; y += STEP )
     {
-        auto row_begin = screen_layout_.find({BORDER_LEFT, y});
-        auto row_end = screen_layout_.find({BORDER_RIGHT-SQUARE_SIDE, y});
+        auto row_begin = screen_layout_.find({LIMIT_LEFT, y});
+        auto row_end = screen_layout_.find({LIMIT_RIGHT, y});
         if ( std::all_of(row_begin, ++row_end, [](auto& p){return p.second;}))
         {
             erase_full_row(y);
@@ -329,7 +327,6 @@ void MainWindow::erase_full_row(qreal row_y_coord)
         {
             tetrominos_.erase(it);
             it--;
-            //delete *it;
         }
     }
     update_scene(row_y_coord);

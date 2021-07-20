@@ -19,16 +19,16 @@ std::vector<QGraphicsRectItem*> Tetromino::create_tetromino(int random)
     QPen blackPen(Qt::black);
     blackPen.setWidth(2);
     tetromino_type_ = random;
-    int line = 80;
+    int offset = 80;
     if ( tetromino_type_ == HORIZONTAL )
     {
         center_brick_ = 2;
         for ( int i = 0; i < 4; ++i )
         {
             square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, redBrush);
-            square_->moveBy(line, 0);
+            square_->moveBy(offset, 0);
             tetromino_bricks_.push_back(square_);
-            line += 20;
+            offset += 20;
         }
     }
     if ( tetromino_type_ == RIGHT_CORNER )
@@ -37,12 +37,12 @@ std::vector<QGraphicsRectItem*> Tetromino::create_tetromino(int random)
         for ( int i = 0; i < 3; ++i )
         {
             square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, blueBrush);
-            square_->moveBy(line, 0);
+            square_->moveBy(offset, 0);
             tetromino_bricks_.push_back(square_);
-            line += 20;
+            offset += 20;
         }
         square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, blueBrush);
-        square_->moveBy(line - SIZE, -SIZE);
+        square_->moveBy(offset - SIZE, -SIZE);
         tetromino_bricks_.push_back(square_);
     }
     if ( tetromino_type_ == LEFT_CORNER )
@@ -51,30 +51,30 @@ std::vector<QGraphicsRectItem*> Tetromino::create_tetromino(int random)
         for ( int i = 0; i < 3; ++i )
         {
             square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, yellowBrush);
-            square_->moveBy(line, 0);
+            square_->moveBy(offset, 0);
             tetromino_bricks_.push_back(square_);
-            line += 20;
+            offset += 20;
         }
         square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, yellowBrush);
-        square_->moveBy((line - 3 * SIZE), -SIZE);
+        square_->moveBy((offset - 3 * SIZE), -SIZE);
         tetromino_bricks_.push_back(square_);
     }
     if ( tetromino_type_ == SQUARE )
     {
-        int line = 100;
+        int offset = 100;
         for ( int i = 0; i < 2; ++i )
         {
             square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, greenBrush);
-            square_->moveBy(line, 0);
+            square_->moveBy(offset, 0);
             tetromino_bricks_.push_back(square_);
-            line += 20;
+            offset += 20;
         }
         square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, greenBrush);
-        square_->moveBy(line - SIZE, -SIZE);
+        square_->moveBy(offset - SIZE, -SIZE);
         tetromino_bricks_.push_back(square_);
 
         square_ = scene_->addRect(0, 0, SIZE, SIZE, blackPen, greenBrush);
-        square_->moveBy(line - 2 * SIZE, -SIZE);
+        square_->moveBy(offset - 2 * SIZE, -SIZE);
         tetromino_bricks_.push_back(square_);
     }
     return tetromino_bricks_;
@@ -98,14 +98,14 @@ void Tetromino::move_horizontal(bool dir_right)
     {
         for ( auto &brick : tetromino_bricks_ )
         {
-            brick->moveBy(20, 0);
+            brick->moveBy(STEP, 0);
         }
     }
     else
     {
         for ( auto &brick : tetromino_bricks_ )
         {
-            brick->moveBy(-20, 0);
+            brick->moveBy(-STEP, 0);
         }
     }
 }

@@ -22,11 +22,16 @@
 #include <algorithm>
 #include <iostream>
 
-const int STEP = 20;
+
 const int BORDER_UP = 0;
 const int BORDER_DOWN = 480;
 const int BORDER_LEFT = 0;
 const int BORDER_RIGHT = 240;
+
+const int LIMIT_UP = 0;
+const int LIMIT_DOWN = 460;
+const int LIMIT_LEFT = 0;
+const int LIMIT_RIGHT = 220;
 
 const int SQUARE_SIDE = 20;
 const int COLUMNS = BORDER_RIGHT / SQUARE_SIDE;

@@ -12,6 +12,7 @@
 #include <QGraphicsItem>
 #include <QDebug>
 
+const int STEP = 20;
 const int SIZE = 20;
 const int HORIZONTAL = 0;
 const int RIGHT_CORNER = 1;
