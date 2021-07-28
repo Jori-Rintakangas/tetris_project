@@ -84,7 +84,7 @@ void MainWindow::on_start_push_button_clicked()
     ui_->start_push_button->setDisabled(true);
     ui_->textBrowser->setText("Game on!");
     initialize_screen_layout();
-    timer_.start(300);
+    timer_.start(150);
     game_timer_.start(1000);
     new_tetromino();
 }
@@ -225,7 +225,7 @@ bool MainWindow::can_move_right()
             return false;
         }
         qreal next_x = current_x + STEP;
-        if ( screen_layout_.at({next_x, current_y} ) == true )
+        if ( screen_layout_.at({next_x, current_y}) == true )
         {
             return false;
         }
@@ -318,15 +318,14 @@ void MainWindow::erase_full_row(qreal row_y_coord)
                 bricks_to_erase.push_back({brick->x(), brick->y()});
             }
         }
-        if ( !bricks_in_row )
+        if ( bricks_in_row )
         {
-            continue;
-        }
-        (*it)->erase_brick(bricks_to_erase);
-        if ( (*it)->is_destroyed() )
-        {
-            tetrominos_.erase(it);
-            it--;
+            (*it)->erase_brick(bricks_to_erase);
+            if ( (*it)->is_destroyed() )
+            {
+                tetrominos_.erase(it);
+                it--;
+            }
         }
     }
     update_scene(row_y_coord);
@@ -335,6 +334,7 @@ void MainWindow::erase_full_row(qreal row_y_coord)
 
 void MainWindow::update_scene(qreal y)
 {
+    std::set<std::pair<qreal, qreal>> new_locs = {};
     for ( auto &tetromino : tetrominos_ )
     {
         std::vector<QGraphicsRectItem*> bricks = tetromino->get_tetromino_info();
@@ -342,9 +342,13 @@ void MainWindow::update_scene(qreal y)
         {
             if ( brick->y() < y )
             {
-                screen_layout_.at({brick->x(), brick->y()}) = false;
+                if ( new_locs.find({brick->x(), brick->y()}) == new_locs.end() )
+                {
+                    screen_layout_.at({brick->x(), brick->y()}) = false;
+                }
                 brick->moveBy(0, STEP);
                 screen_layout_.at({brick->x(), brick->y()}) = true;
+                new_locs.insert({brick->x(), brick->y()});
             }
         }
     }
