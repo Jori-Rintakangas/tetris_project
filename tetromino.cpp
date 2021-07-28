@@ -119,6 +119,7 @@ void Tetromino::erase_brick(std::vector<std::pair<qreal, qreal>> bricks)
         {
             if ( (*it)->x() == bricks.at(i).first && (*it)->y() == bricks.at(i).second )
             {
+                delete *it;
                 tetromino_bricks_.erase(it);
                 it--;
             }

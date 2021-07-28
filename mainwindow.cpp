@@ -46,6 +46,10 @@ MainWindow::MainWindow(QWidget *parent):
 
 MainWindow::~MainWindow()
 {
+    for ( auto &tetromino : tetrominos_ )
+    {
+        delete tetromino;
+    }
     delete ui_;
 }
 
@@ -92,11 +96,15 @@ void MainWindow::on_start_push_button_clicked()
 
 void MainWindow::on_reset_push_button_clicked()
 {
-    QList<QGraphicsItem*> items = ui_->graphicsView->items();
-
-    for ( auto& item : items )
+    for ( auto& tetromino : tetrominos_ )
     {
-        scene_->removeItem(item);
+        std::vector<QGraphicsRectItem*> bricks = tetromino->get_tetromino_info();
+        for ( auto& brick : bricks )
+        {
+            scene_->removeItem(brick);
+            delete brick;
+        }
+        delete tetromino;
     }
     seconds_ = 0;
     minutes_ = 0;
@@ -108,6 +116,7 @@ void MainWindow::on_reset_push_button_clicked()
 
     game_over_ = false;
     screen_layout_.clear();
+    tetrominos_.clear();
     ui_->textBrowser->clear();
     ui_->start_push_button->setDisabled(false);
 }
@@ -323,6 +332,7 @@ void MainWindow::erase_full_row(qreal row_y_coord)
             (*it)->erase_brick(bricks_to_erase);
             if ( (*it)->is_destroyed() )
             {
+                delete *it;
                 tetrominos_.erase(it);
                 it--;
             }
